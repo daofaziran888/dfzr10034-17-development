@@ -5,6 +5,8 @@
 """
 from __future__ import annotations
 
+from contextlib import asynccontextmanager
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -12,7 +14,21 @@ from app.config import settings
 from app.routers import ROUTERS
 from app.store import store
 
-app = FastAPI(title="治数工坊 · 数据治理与生命周期管理平台", version="1.0.0")
+
+@asynccontextmanager
+async def lifespan(_app: FastAPI):
+    # 启动时构建一次评分贡献视图演示场景，保证页面打开即有完整数据。
+    from app.demo import build_demo_scenario
+
+    build_demo_scenario()
+    yield
+
+
+app = FastAPI(
+    title="治数工坊 · 数据治理与生命周期管理平台",
+    version="1.0.0",
+    lifespan=lifespan,
+)
 
 app.add_middleware(
     CORSMiddleware,
@@ -32,6 +48,15 @@ def health() -> dict[str, object]:
 def overview() -> dict[str, object]:
     """运营概览：把各业务模块的待处理量汇总成看板卡片。"""
     return store.overview()
+
+
+@app.post("/api/demo/reset")
+def rebuild_demo() -> dict[str, object]:
+    """重建评分贡献视图演示场景（测试/演示用）。"""
+    from app.demo import build_demo_scenario
+
+    store.reset()
+    return build_demo_scenario()
 
 
 # 资源路由含 /api/{module}，必须放在 health / overview 之后注册，

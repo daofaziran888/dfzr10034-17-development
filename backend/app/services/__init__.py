@@ -24,11 +24,15 @@ from app.services.version_history import VersionHistoryService
 from app.services.schedule_job import ScheduleJobService
 from app.services.diff_report import DiffReportService
 from app.services.owner_mgr import OwnerMgrService
+from app.services.quality_measure import QualityMeasureService
+from app.services.survey_week import SurveyWeekService
+from app.services.payout_week import PayoutWeekService
 
 # 服务模块别名，供跨模块调用
 QUALITY_SERVICE = QualityRuleService()
 COMPLIANCE_SERVICE = ComplianceScanService()
 LIFECYCLE_SERVICE = LifecyclePolicyService()
+QUALITY_MEASURE_SERVICE = QualityMeasureService()
 
 SERVICES: dict[str, BaseModuleService] = {
     "asset_registry": AssetRegistryService(),
@@ -53,6 +57,9 @@ SERVICES: dict[str, BaseModuleService] = {
     "schedule_job": ScheduleJobService(),
     "diff_report": DiffReportService(),
     "owner_mgr": OwnerMgrService(),
+    "quality_measure": QUALITY_MEASURE_SERVICE,
+    "survey_week": SurveyWeekService(),
+    "payout_week": PayoutWeekService(),
 }
 
 
